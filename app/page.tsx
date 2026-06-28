@@ -70,7 +70,7 @@ export default function HomePage() {
               fetchPriority="high"
               loading="eager"
             />
-            <span>Sherin</span>
+            <span>Sherin for FLUX</span>
           </a>
           <Link
             href="/access"
