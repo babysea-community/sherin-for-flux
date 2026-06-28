@@ -1,0 +1,12 @@
+title = "Sherin gitleaks config"
+
+[allowlist]
+description = "Allow Sherin documentation and CI placeholder examples."
+regexTarget = "match"
+regexes = [
+  '''BFL_API_KEY=ci''',
+  '''BFL_API_KEY=<bfl_api_key>''',
+  '''OWNER_EMAIL=owner@example.com''',
+  '''SUPABASE_SECRET_KEY=ci''',
+  '''NEXT_PUBLIC_SUPABASE_PUBLIC_KEY=ci''',
+]

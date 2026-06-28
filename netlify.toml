@@ -1,0 +1,18 @@
+[build]
+  command = "pnpm run build"
+  publish = ".next"
+
+[template.environment]
+  NEXT_PUBLIC_SITE_URL = "Required. The exact URL where Sherin runs, for example https://<your_domain>."
+  OWNER_EMAIL = "Required. The one Google email allowed to access the dashboard."
+  NEXT_PUBLIC_SUPABASE_URL = "Required. Your Supabase project URL."
+  NEXT_PUBLIC_SUPABASE_PUBLIC_KEY = "Required. Your Supabase publishable or anon key."
+  SUPABASE_SECRET_KEY = "Required. Your Supabase service role key. Keep it server-only."
+  INFERENCE_PROVIDER = "Required. Inference provider: bfl or babysea. Default bfl."
+  BFL_API_KEY = "Required when INFERENCE_PROVIDER=bfl. Your Black Forest Labs API key."
+  BFL_API_BASE_URL = "Required when INFERENCE_PROVIDER=bfl. Black Forest Labs API base URL, default https://api.bfl.ai."
+  STORAGE_PROVIDER = "Required. Storage provider: supabase-storage, aws-s3, cloudflare-r2, or vercel-blob. Default supabase-storage."
+  CUSTOM_USER_STORAGE_QUOTA_GB = "Required. Per-owner stored image quota in GB. Default 10."
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
