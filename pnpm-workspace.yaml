@@ -17,7 +17,7 @@ catalog:
   '@types/node': 25.3.1
   '@types/react': 19.2.14
   '@types/react-dom': 19.2.3
-  '@vercel/blob': 2.4.1
+  '@vercel/blob': 2.5.0
   babysea: 2.0.0
   babel-plugin-react-compiler: 1.0.0
   class-variance-authority: 0.7.1
