@@ -5,7 +5,8 @@ import { Toaster } from '@/components/ui/sonner';
 const title = 'Sherin';
 const description =
   'Private workspace for generative media with own key, domain, and storage.';
-const socialImageUrl = 'https://cdn.babysea.live/assets/oss/sherin-card.png';
+const socialImageUrl =
+  'https://cdn.babysea.live/assets/oss/sherin-for-flux-card.png';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://sherin-for-flux.babysea.live'),
