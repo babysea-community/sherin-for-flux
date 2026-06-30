@@ -388,7 +388,7 @@ export default function ImageGallery() {
       <div className="mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="relative pb-24 pt-4 text-center sm:pb-28 lg:pb-32">
           <h2 className="text-2xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl">
-            <span>Artwork</span>
+            <span>Creator</span>
             <span className="mx-4 text-slate-500">×</span>
             <span className="font-normal text-slate-400">Gallery</span>
           </h2>

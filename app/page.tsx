@@ -1,7 +1,6 @@
 import {
   ExternalLink,
   GitCompareArrows,
-  Github,
   HeartHandshake,
   KeyRound,
   Rocket,
@@ -9,19 +8,37 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
+import type { ComponentType, SVGProps } from 'react';
 
+import {
+  InlineDigitalOcean,
+  InlineNetlify,
+  InlineRailwayLight,
+  InlineRenderLight,
+  InlineVercelLight,
+} from '@/components/icons/inline-host';
+import { InlineBlackForestLabsLight } from '@/components/icons/inline-inference';
+import { InlineGitHub } from '@/components/icons/inline-git';
+import {
+  InlineAwsS3Storage,
+  InlineCloudflareR2Storage,
+  InlineSupabaseStorage,
+  InlineVercelBlob,
+} from '@/components/icons/inline-storage';
 import { ClientGallery } from '@/components/gallery/client';
+import { DeployDropdown } from '@/components/deploy-dropdown';
+import { InlineNetlify as InlineNetlifySponsor } from '@/components/icons/inline-sponsor';
 import { ProtectedImage } from '@/components/protected-image';
+import { MODEL_OPTIONS } from '@/lib/app-config';
 
 const repositoryUrl = 'https://github.com/babysea-community/sherin-for-flux';
-const templatesUrl = 'https://babysea.ai/templates/sherin-for-flux';
 
 const communityLinks = [
   {
     href: repositoryUrl,
     label: 'Source code',
-    description: 'Sherin project code, issues, releases, and docs.',
-    Icon: Github,
+    description: 'Project source code, issues, releases, and docs.',
+    Icon: InlineGitHub,
   },
   {
     href: `${repositoryUrl}/blob/main/CODE_OF_CONDUCT.md`,
@@ -41,6 +58,62 @@ const shipCta =
   'Sherin runs on your own inference API key, your own domain, and your own storage. There is no paid plan inside Sherin.';
 
 const pageContainerClass = 'mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-10';
+const sectionTitleClassName =
+  'text-2xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl';
+
+type StackItem = {
+  ariaLabel: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label?: string;
+};
+
+const supportedModels = MODEL_OPTIONS.map((model) => ({
+  ariaLabel: model.label,
+  Icon: InlineBlackForestLabsLight,
+  label: model.label,
+})) satisfies StackItem[];
+
+const storageOptions = [
+  {
+    ariaLabel: 'Supabase Storage',
+    Icon: InlineSupabaseStorage,
+  },
+  {
+    ariaLabel: 'AWS S3',
+    Icon: InlineAwsS3Storage,
+  },
+  {
+    ariaLabel: 'Cloudflare R2',
+    Icon: InlineCloudflareR2Storage,
+  },
+  {
+    ariaLabel: 'Vercel Blob',
+    Icon: InlineVercelBlob,
+  },
+] satisfies StackItem[];
+
+const hostingOptions = [
+  {
+    ariaLabel: 'DigitalOcean',
+    Icon: InlineDigitalOcean,
+  },
+  {
+    ariaLabel: 'Netlify',
+    Icon: InlineNetlify,
+  },
+  {
+    ariaLabel: 'Railway',
+    Icon: InlineRailwayLight,
+  },
+  {
+    ariaLabel: 'Render',
+    Icon: InlineRenderLight,
+  },
+  {
+    ariaLabel: 'Vercel',
+    Icon: InlineVercelLight,
+  },
+] satisfies StackItem[];
 
 export default function HomePage() {
   return (
@@ -105,32 +178,19 @@ export default function HomePage() {
                 rel="noreferrer noopener"
                 className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-fuchsia-300 px-4 py-3 text-xs font-semibold text-slate-950 shadow-lg shadow-[#4a044e66] transition hover:bg-fuchsia-200 sm:px-6 sm:text-sm"
               >
-                <Github className="size-4" aria-hidden="true" />
+                <InlineGitHub className="size-4" aria-hidden="true" />
                 View source
               </a>
-              <a
-                href={templatesUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-[#f0abfc66] px-4 py-3 text-xs font-semibold text-fuchsia-100 transition hover:bg-[#f0abfc1a] sm:px-6 sm:text-sm"
-              >
-                See templates
-                <ExternalLink className="size-4" aria-hidden="true" />
-              </a>
+              <DeployDropdown />
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-[#20263a] bg-[#070b1a] p-5">
             <div className="rounded-[1.4rem] border border-[#20263a] bg-[#050817] p-5">
               <div className="flex items-center justify-between gap-3 border-b border-[#20263a] pb-4">
-                <div>
-                  <p className="text-sm font-semibold text-white">
-                    Project surface
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Source, conduct, license, and community links
-                  </p>
-                </div>
+                <p className="text-base font-semibold text-white">
+                  Project surface
+                </p>
                 <GitCompareArrows
                   className="size-5 text-fuchsia-200"
                   aria-hidden="true"
@@ -175,7 +235,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-[#20263a] bg-[#000416]">
+      <SupportedModelsSection />
+
+      <StorageHostingSection />
+
+      <SponsorSection />
+
+      <section className="border-t border-[#20263a] bg-[#000416]">
         <div className={`${pageContainerClass} py-28 sm:py-36`}>
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-14 text-center sm:gap-16 lg:gap-20">
             <p className="max-w-4xl text-xl font-semibold leading-8 tracking-tight text-white sm:text-2xl sm:leading-9 lg:text-3xl lg:leading-10">
@@ -210,12 +276,12 @@ export default function HomePage() {
         className={`${pageContainerClass} flex flex-col gap-3 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between`}
       >
         <a
-          href="https://babysea.ai/about"
+          href="https://www.netlify.com"
           target="_blank"
           rel="noreferrer noopener"
           className="font-medium text-[#05BDBA] underline decoration-[#05BDBA66] underline-offset-4 transition hover:text-white hover:decoration-white"
         >
-          Built for the AI community
+          This site is powered by Netlify
         </a>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <a
@@ -237,5 +303,144 @@ export default function HomePage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+function SupportedModelsSection() {
+  return (
+    <section className="border-t border-[#20263a] bg-[#000416]">
+      <div className={`${pageContainerClass} py-28 sm:py-36`}>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-14 text-center sm:gap-16 lg:gap-20">
+          <div className="max-w-4xl">
+            <h2 className={sectionTitleClassName}>
+              <span>FLUX</span>
+              <span className="mx-4 text-slate-500">×</span>
+              <span className="font-normal text-slate-400">models</span>
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
+              Powered by FLUX models inside one private studio
+            </p>
+          </div>
+
+          <div className="flex max-w-5xl flex-wrap items-center justify-center gap-3 sm:gap-4">
+            {supportedModels.map((item) => {
+              const Icon = item.Icon;
+
+              return (
+                <span
+                  key={item.ariaLabel}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#f0abfc4d] bg-[#f0abfc14] px-3.5 py-2 text-xs font-semibold text-fuchsia-50 sm:text-sm"
+                  title={item.ariaLabel}
+                >
+                  <Icon
+                    className="h-4 w-auto shrink-0 text-fuchsia-100"
+                    aria-hidden="true"
+                  />
+                  <span>{item.label}</span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SponsorSection() {
+  return (
+    <section className="border-t border-[#20263a] bg-[#000416]">
+      <div className={`${pageContainerClass} py-28 sm:py-36`}>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-14 text-center sm:gap-16 lg:gap-20">
+          <div className="max-w-4xl">
+            <h2 className={sectionTitleClassName}>
+              <span>Sponsor</span>
+              <span className="mx-4 text-slate-500">×</span>
+              <span className="font-normal text-slate-400">Sherin</span>
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
+              Sponsors keep Sherin free and open-source for everyone
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+            <a
+              href="https://www.netlify.com"
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="Netlify"
+              title="Netlify"
+              className="inline-flex items-center justify-center rounded-2xl border border-[#20263a] bg-[#0a0f22] px-8 py-5 transition hover:scale-105 hover:border-[#f0abfc33] hover:bg-[#111833]"
+            >
+              <InlineNetlifySponsor
+                className="h-10 w-auto"
+                aria-hidden="true"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StorageHostingSection() {
+  return (
+    <section className="border-t border-[#20263a] bg-[#000416]">
+      <div className={`${pageContainerClass} py-28 sm:py-36`}>
+        <div className="mx-auto grid max-w-6xl gap-14 text-center sm:gap-16 lg:grid-cols-2 lg:gap-20">
+          <IconColumn
+            title="Storage"
+            subtitle="Generated media lands in storage you control"
+            items={storageOptions}
+          />
+          <IconColumn
+            title="Hosting"
+            subtitle="Deploy private workspace on your host"
+            items={hostingOptions}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IconColumn({
+  items,
+  subtitle,
+  title,
+}: {
+  items: readonly StackItem[];
+  subtitle: string;
+  title: string;
+}) {
+  return (
+    <section className="text-center">
+      <h2 className={sectionTitleClassName}>{title}</h2>
+      <p className="mt-4 text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
+        {subtitle}
+      </p>
+
+      <div className="mt-14 flex flex-wrap items-center justify-center gap-4 sm:mt-10 sm:gap-4 lg:mt-10">
+        {items.map((item) => {
+          const Icon = item.Icon;
+
+          return (
+            <span
+              key={item.ariaLabel}
+              aria-label={item.ariaLabel}
+              role="img"
+              title={item.ariaLabel}
+              className="inline-flex size-12 items-center justify-center rounded-lg border border-[#20263a] bg-[#0a0f22] transition hover:scale-105 hover:border-[#f0abfc33] hover:bg-[#111833] sm:size-14"
+            >
+              <Icon
+                aria-hidden="true"
+                className="h-6 w-auto shrink-0 text-fuchsia-100 sm:h-8"
+              />
+            </span>
+          );
+        })}
+      </div>
+    </section>
   );
 }

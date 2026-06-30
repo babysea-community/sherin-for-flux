@@ -461,7 +461,7 @@ function checkDeployButtons() {
   const expectedNetlifyButton = `[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](${SHERIN_NETLIFY_DEPLOY_URL})`;
   const expectedRailwayButton = `[![Deploy on Railway](https://railway.com/button.svg)](${SHERIN_RAILWAY_DEPLOY_URL})`;
   const expectedRenderButton = `[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](${SHERIN_RENDER_DEPLOY_URL})`;
-  const expectedNetlifyHomeLink = 'Built for the AI community';
+  const expectedNetlifyHomeLink = 'This site is powered by Netlify';
   const expectedNetlifyHomeHref = 'https://babysea.ai/about';
 
   if (!readme.includes(expectedVercelButton)) {
