@@ -361,6 +361,15 @@ function SponsorSection() {
             <p className="mt-4 text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
               Sponsors keep Sherin free and open-source for everyone
             </p>
+            <a
+              href="https://github.com/sponsors/babysea-community"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-fuchsia-300 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-[#4a044e66] transition hover:bg-fuchsia-200"
+            >
+              <HeartHandshake className="size-4" aria-hidden="true" />
+              Sponsor us
+            </a>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
