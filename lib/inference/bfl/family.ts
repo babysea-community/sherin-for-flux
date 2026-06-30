@@ -173,7 +173,10 @@ export function getBflSemanticModel(
 }
 
 function semanticModelLabel(modelIdentifier: BflModelId) {
-  return getBflSemanticModel(modelIdentifier).uiName;
+  return getBflSemanticModel(modelIdentifier).uiName.replace(
+    /\b(\d+b)\b/gi,
+    (m) => m.toUpperCase(),
+  );
 }
 
 function compareBflModelOptions(
