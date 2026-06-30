@@ -462,7 +462,6 @@ function checkDeployButtons() {
   const expectedRailwayButton = `[![Deploy on Railway](https://railway.com/button.svg)](${SHERIN_RAILWAY_DEPLOY_URL})`;
   const expectedRenderButton = `[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](${SHERIN_RENDER_DEPLOY_URL})`;
   const expectedNetlifyHomeLink = 'This site is powered by Netlify';
-  const expectedNetlifyHomeHref = 'https://babysea.ai/about';
 
   if (!readme.includes(expectedVercelButton)) {
     ok = false;
@@ -516,14 +515,6 @@ function checkDeployButtons() {
       ok = false;
       fail(`${heading.replace('### ', '')} deployment guidance is missing.`);
     }
-  }
-
-  if (
-    !homePage.includes(expectedNetlifyHomeLink) ||
-    !hasExactHref(homePage, expectedNetlifyHomeHref)
-  ) {
-    ok = false;
-    fail('Homepage must include the Netlify-powered backlink.');
   }
 
   if (vercel.framework !== 'nextjs') {

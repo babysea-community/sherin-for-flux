@@ -34,7 +34,7 @@ const deployLinks = [
   },
   {
     label: 'Vercel',
-    href: 'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbabysea-community%2Fsherin-for-flux&project-name=sherin-for-flux&repository-name=sherin-for-flux&env=NEXT_PUBLIC_SITE_URL,OWNER_EMAIL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLIC_KEY,SUPABASE_SECRET_KEY,INFERENCE_PROVIDER,RUNWAYML_API_SECRET,STORAGE_PROVIDER,CUSTOM_USER_STORAGE_QUOTA_GB',
+    href: 'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbabysea-community%2Fsherin-for-flux&project-name=sherin-for-flux&repository-name=sherin-for-flux&env=NEXT_PUBLIC_SITE_URL,OWNER_EMAIL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLIC_KEY,SUPABASE_SECRET_KEY,INFERENCE_PROVIDER,BFL_API_KEY,BFL_API_BASE_URL,STORAGE_PROVIDER,CUSTOM_USER_STORAGE_QUOTA_GB',
     Icon: InlineVercelLight,
   },
 ] as const;

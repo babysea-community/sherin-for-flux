@@ -396,7 +396,7 @@ function StorageHostingSection() {
           />
           <IconColumn
             title="Hosting"
-            subtitle="Deploy private workspace on your host"
+            subtitle="Deploy private workspace on your preferred host"
             items={hostingOptions}
           />
         </div>
