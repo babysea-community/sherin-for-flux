@@ -6,6 +6,7 @@ All notable changes will be documented here. The format follows [Keep a Changelo
 
 ### Added
 
+- Add free-tier scheduled queue draining on both hosts through the `CRON_SECRET`-guarded `/api/generations/process` endpoint: a Netlify Scheduled Function (`netlify/functions/process-generations`, every 5 minutes) and a Vercel Cron Job (`vercel.json`, daily - the Hobby-plan maximum). Both advance queued or running generations when no owner browser is open; the client kicker and post-submit processing cover active sessions.
 - Add optional Backblaze B2 storage support for generated media and reference assets.
 - Cancel provider-side work when the owner cancels an active generation: Black Forest Labs tasks are canceled through the Black Forest Labs API and BabySea generations through the SDK (best-effort) before the generation is marked failed.
 

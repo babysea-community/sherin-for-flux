@@ -55,6 +55,7 @@ export default [
       'next-env.d.ts',
       'lib/database.types.ts',
       'public/**',
+      'netlify/**',
     ],
   },
   js.configs.recommended,

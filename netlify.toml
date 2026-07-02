@@ -16,3 +16,10 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Scheduled Function: drain the generation queue every 5 minutes so queued or
+# running generations advance even when no owner browser is open. Runs on the
+# Netlify free plan. Requires CRON_SECRET in the Netlify site environment
+# (Functions scope).
+[functions."process-generations"]
+  schedule = "*/5 * * * *"
