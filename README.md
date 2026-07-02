@@ -138,7 +138,7 @@ Supabase Storage is the default and fallback storage path. AWS S3, Backblaze B2,
 
 ## Supported models
 
-Supported model names and provider fields are registered in [`lib/model-family.ts`](lib/model-family.ts), [`lib/inference/bfl/models.ts`](lib/inference/bfl/models.ts), and [`lib/inference/babysea/models.ts`](lib/inference/babysea/models.ts).
+Supported model names and provider fields are registered in [`lib/model-family.ts`](lib/model-family.ts), [`lib/inference/black-forest-labs/models.ts`](lib/inference/black-forest-labs/models.ts), and [`lib/inference/babysea/models.ts`](lib/inference/babysea/models.ts).
 
 | Model name         | Model ID                 |
 | :----------------- | :----------------------- |
@@ -196,16 +196,16 @@ Use an external scheduler for `GET /api/generations/process` when you want backg
 
 ## Customize
 
-| Change     | Files                                                                                                                                      |
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| UI         | `app/page.tsx`, `app/access/page.tsx`, `app/dashboard/**`                                                                                  |
-| Auth       | `lib/auth/owner.ts`, `app/access/_lib/server-actions.ts`, `supabase/migrations/001_sherin.sql`                                             |
-| Models     | `lib/model-family.ts`, `lib/app-config.ts`, `lib/inference/bfl/models.ts`, `lib/inference/babysea/models.ts`, `test/sherin-models.test.ts` |
-| Inference  | `lib/inference/index.ts`, `lib/inference/bfl/server-actions.ts`, `lib/inference/babysea/server-actions.ts`                                 |
-| Storage    | `lib/storage/index.ts`, `lib/storage/*/server-actions.ts`, `lib/storage/s3-compatible-storage.ts`, `supabase/migrations/001_sherin.sql`    |
-| Worker     | `app/dashboard/studio/_lib/generation-worker.ts`, `app/api/generations/process/route.ts`                                                   |
-| Monitoring | `instrumentation.ts`, `instrumentation-client.ts`, `lib/monitoring`, `scripts/sentry-project-check.mjs`                                    |
-| Deploy     | `.do/deploy.template.yaml`, `.env.example`, `netlify.toml`, `render.yaml`, `vercel.json`, `scripts/doctor.mjs`                             |
+| Change     | Files                                                                                                                                                    |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI         | `app/page.tsx`, `app/access/page.tsx`, `app/dashboard/**`                                                                                                |
+| Auth       | `lib/auth/owner.ts`, `app/access/_lib/server-actions.ts`, `supabase/migrations/001_sherin.sql`                                                           |
+| Models     | `lib/model-family.ts`, `lib/app-config.ts`, `lib/inference/black-forest-labs/models.ts`, `lib/inference/babysea/models.ts`, `test/sherin-models.test.ts` |
+| Inference  | `lib/inference/index.ts`, `lib/inference/black-forest-labs/server-actions.ts`, `lib/inference/babysea/server-actions.ts`                                 |
+| Storage    | `lib/storage/index.ts`, `lib/storage/*/server-actions.ts`, `lib/storage/s3-compatible-storage.ts`, `supabase/migrations/001_sherin.sql`                  |
+| Worker     | `app/dashboard/studio/_lib/generation-worker.ts`, `app/api/generations/process/route.ts`                                                                 |
+| Monitoring | `instrumentation.ts`, `instrumentation-client.ts`, `lib/monitoring`, `scripts/sentry-project-check.mjs`                                                  |
+| Deploy     | `.do/deploy.template.yaml`, `.env.example`, `netlify.toml`, `render.yaml`, `vercel.json`, `scripts/doctor.mjs`                                           |
 
 ## Troubleshooting
 

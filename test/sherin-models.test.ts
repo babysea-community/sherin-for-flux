@@ -14,7 +14,7 @@ import { resolveBabySeaModelIdentifier } from '@/lib/inference/babysea/models';
 import {
   resolveBflModelConfig,
   resolveBflProviderModel,
-} from '@/lib/inference/bfl/models';
+} from '@/lib/inference/black-forest-labs/models';
 
 const BFL_MODEL_EXPECTATIONS = [
   {

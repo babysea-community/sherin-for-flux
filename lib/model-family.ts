@@ -8,9 +8,9 @@
 import {
   SHERIN_BYOK_FAMILY as PROVIDER_FAMILY,
   hasProviderModelConfig,
-} from './inference/bfl/family';
+} from './inference/black-forest-labs/family';
 
-export { SHERIN_BYOK_FAMILY as BYOK_FAMILY } from './inference/bfl/family';
+export { SHERIN_BYOK_FAMILY as BYOK_FAMILY } from './inference/black-forest-labs/family';
 
 export const MODEL_OPTIONS = PROVIDER_FAMILY.modelOptions;
 export type SherinModelId = (typeof MODEL_OPTIONS)[number]['id'];

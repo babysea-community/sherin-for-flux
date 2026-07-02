@@ -5,7 +5,7 @@ import {
   isBflApiHost,
   normalizeBflApiBaseUrl,
   validateBflPollingUrl,
-} from '@/lib/inference/bfl/server-actions';
+} from '@/lib/inference/black-forest-labs/server-actions';
 import type { InferenceRequest } from '@/lib/inference/types';
 
 const PNG_BASE64_IMAGE_PROMPT =
