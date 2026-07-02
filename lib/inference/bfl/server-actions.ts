@@ -9,6 +9,7 @@ import { resolveBflModelConfig } from './models';
 import { assertBflSemanticParams } from './semantic-lady';
 import type {
   InferenceByokParams,
+  InferenceCancelResult,
   InferenceProvider,
   InferenceRequest,
   InferenceResult,
@@ -64,6 +65,16 @@ export function createBflProvider(): InferenceProvider {
       const value = metadata.bfl_request_id;
 
       return typeof value === 'string' && value.length > 0 ? value : null;
+    },
+    async cancel(): Promise<InferenceCancelResult> {
+      // BFL exposes no cancel endpoint (submit + poll only), matching how
+      // BabySea's own inference hub treats BFL. Owner-side cancel still marks
+      // the generation failed; any in-flight BFL job runs to completion.
+      return {
+        attempted: false,
+        acknowledged: false,
+        error: 'Black Forest Labs does not support cancel',
+      };
     },
     prepareRequest({ formData, request }) {
       const modelConfig = resolveBflModelConfig(request.model);
