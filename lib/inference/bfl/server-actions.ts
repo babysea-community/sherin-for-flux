@@ -837,7 +837,9 @@ function isBflFlux2Endpoint(endpoint: string) {
 export function isBflApiHost(hostname: string) {
   const host = hostname.toLowerCase();
 
-  return /^api(?:[.-][a-z0-9-]+)*\.bfl\.ai$/.test(host);
+  // Disjoint separator/label classes ([.-] vs [a-z0-9]) keep each segment
+  // unambiguous, preventing ReDoS backtracking (CodeQL js/redos).
+  return /^api(?:[.-][a-z0-9]+)*\.bfl\.ai$/.test(host);
 }
 
 function assignNumberParam(
