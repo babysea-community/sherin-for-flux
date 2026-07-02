@@ -29,8 +29,9 @@ import { formatDate } from '@/lib/utils';
 import { InlineBabySea } from '@/components/icons/inline-babysea';
 import { InlineBlackForestLabsLight } from '@/components/icons/inline-inference';
 import {
-  InlineAwsS3Storage,
-  InlineCloudflareR2Storage,
+  InlineAwsS3,
+  InlineBackblazeB2,
+  InlineCloudflareR2,
   InlineSupabaseStorage,
   InlineVercelBlob,
 } from '@/components/icons/inline-storage';
@@ -44,7 +45,7 @@ import { GalleryPreviewPanel } from './_components/gallery-preview-panel';
 
 export const metadata: Metadata = {
   title: 'Gallery',
-  description: 'Every media asset you have generated through Sherin.',
+  description: 'Every media asset you have generated.',
   robots: { index: false, follow: false },
 };
 
@@ -79,6 +80,8 @@ export default async function GalleryPage() {
     const storageProvider = storageProviderForGeneration(generation);
     const fallbackStorageProvider =
       fallbackStorageProviderForGeneration(generation);
+    const fallbackStorageReason =
+      fallbackStorageReasonForGeneration(generation);
 
     return {
       ...generation,
@@ -92,6 +95,7 @@ export default async function GalleryPage() {
         storageProvider,
         generation.status,
         fallbackStorageProvider,
+        fallbackStorageReason,
       ),
       fallbackStorageProvider,
       previewContentType,
@@ -351,27 +355,24 @@ function storageProviderSummaryValue(provider: string): ProviderSummaryValue {
     ? ' (fallback)'
     : '';
 
-  if (normalizedProvider === 'supabase-storage') {
+  if (normalizedProvider === 'aws-s3') {
     return {
       content: (
         <>
-          <InlineSupabaseStorage
-            className="size-4 shrink-0"
-            aria-hidden="true"
-          />
-          <span>Supabase Storage{fallbackSuffix}</span>
+          <InlineAwsS3 className="size-4 shrink-0" aria-hidden="true" />
+          <span>AWS S3{fallbackSuffix}</span>
         </>
       ),
       key: provider,
     };
   }
 
-  if (normalizedProvider === 'aws-s3') {
+  if (normalizedProvider === 'backblaze-b2') {
     return {
       content: (
         <>
-          <InlineAwsS3Storage className="size-4 shrink-0" aria-hidden="true" />
-          <span>AWS S3{fallbackSuffix}</span>
+          <InlineBackblazeB2 className="size-4 shrink-0" aria-hidden="true" />
+          <span>Backblaze B2{fallbackSuffix}</span>
         </>
       ),
       key: provider,
@@ -382,11 +383,23 @@ function storageProviderSummaryValue(provider: string): ProviderSummaryValue {
     return {
       content: (
         <>
-          <InlineCloudflareR2Storage
+          <InlineCloudflareR2 className="size-4 shrink-0" aria-hidden="true" />
+          <span>Cloudflare R2{fallbackSuffix}</span>
+        </>
+      ),
+      key: provider,
+    };
+  }
+
+  if (normalizedProvider === 'supabase-storage') {
+    return {
+      content: (
+        <>
+          <InlineSupabaseStorage
             className="size-4 shrink-0"
             aria-hidden="true"
           />
-          <span>Cloudflare R2{fallbackSuffix}</span>
+          <span>Supabase Storage{fallbackSuffix}</span>
         </>
       ),
       key: provider,
@@ -461,16 +474,20 @@ function formatInferenceProvider(provider: string) {
 }
 
 function formatStorageProvider(provider: string) {
-  if (provider === 'supabase-storage') {
-    return 'Supabase Storage';
-  }
-
   if (provider === 'aws-s3') {
     return 'AWS S3';
   }
 
+  if (provider === 'backblaze-b2') {
+    return 'Backblaze B2';
+  }
+
   if (provider === 'cloudflare-r2') {
     return 'Cloudflare R2';
+  }
+
+  if (provider === 'supabase-storage') {
+    return 'Supabase Storage';
   }
 
   if (provider === 'vercel-blob') {
@@ -500,15 +517,15 @@ function normalizeStorageProviderForSummary(provider: string | null) {
     .toLowerCase()
     .replace(/\s*\(fallback\)\s*$/, '');
 
-  if (
-    normalizedProvider === 'supabase-storage' ||
-    normalizedProvider === 'supabase storage'
-  ) {
-    return 'supabase-storage';
-  }
-
   if (normalizedProvider === 'aws-s3' || normalizedProvider === 'aws s3') {
     return 'aws-s3';
+  }
+
+  if (
+    normalizedProvider === 'backblaze-b2' ||
+    normalizedProvider === 'backblaze b2'
+  ) {
+    return 'backblaze-b2';
   }
 
   if (
@@ -516,6 +533,13 @@ function normalizeStorageProviderForSummary(provider: string | null) {
     normalizedProvider === 'cloudflare r2'
   ) {
     return 'cloudflare-r2';
+  }
+
+  if (
+    normalizedProvider === 'supabase-storage' ||
+    normalizedProvider === 'supabase storage'
+  ) {
+    return 'supabase-storage';
   }
 
   if (
@@ -596,12 +620,22 @@ function fallbackStorageProviderForGeneration(generation: {
   );
 }
 
+function fallbackStorageReasonForGeneration(generation: {
+  metadata: Parameters<typeof getGenerationMetadataString>[0];
+}) {
+  return getGenerationMetadataString(
+    generation.metadata,
+    'sherin_storage_fallback_reason',
+  );
+}
+
 function imageInfoForGeneration(
   previewSource: 'storage' | null,
   inferenceProvider: string,
   storageProvider: string,
   status: string,
   fallbackStorageProvider: string | null,
+  fallbackStorageReason: string | null,
 ) {
   if (previewSource === 'storage') {
     if (
@@ -613,6 +647,12 @@ function imageInfoForGeneration(
           Your <CodeValue>{storageProvider}</CodeValue> works as fallback, but
           your <CodeValue>{fallbackStorageProvider}</CodeValue> is not set up
           correctly.
+          {fallbackStorageReason ? (
+            <>
+              {' '}
+              Reason: <CodeValue>{fallbackStorageReason}</CodeValue>
+            </>
+          ) : null}
         </>
       );
     }

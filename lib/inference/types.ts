@@ -43,6 +43,15 @@ export type InferenceGenerateOptions = {
   resumeMetadata?: Record<string, unknown> | null;
 };
 
+export type InferenceCancelResult = {
+  /** True when a provider cancel API call was actually issued. */
+  attempted: boolean;
+  /** True when the provider acknowledged the cancellation. */
+  acknowledged: boolean;
+  /** Reason when the cancel was not attempted or not acknowledged. */
+  error?: string;
+};
+
 export interface InferenceProvider {
   readonly id: InferenceProviderId;
   readonly label: string;
@@ -50,6 +59,7 @@ export interface InferenceProvider {
   extractProviderGenerationId?(
     metadata: Record<string, unknown>,
   ): string | null;
+  cancel?(providerGenerationId: string): Promise<InferenceCancelResult>;
   prepareRequest?(input: {
     formData: FormData;
     request: InferenceRequest;

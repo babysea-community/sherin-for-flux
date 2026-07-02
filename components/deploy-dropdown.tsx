@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import {
   InlineDigitalOcean,
-  InlineNetlify,
+  InlineNetlifyLight,
   InlineRailwayLight,
   InlineRenderLight,
   InlineVercelLight,
@@ -20,7 +20,7 @@ const deployLinks = [
   {
     label: 'Netlify',
     href: 'https://app.netlify.com/start/deploy?repository=https://github.com/babysea-community/sherin-for-flux',
-    Icon: InlineNetlify,
+    Icon: InlineNetlifyLight,
   },
   {
     label: 'Railway',

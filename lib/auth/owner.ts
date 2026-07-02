@@ -3,7 +3,7 @@ import 'server-only';
 import { requireEmailEnv } from '../utils/env';
 
 /**
- * Sherin is a single-user workspace. The owner email comes from the env file
+ * Single-user workspace. The owner email comes from the env file
  * and is the only Google account that may sign in.
  */
 export function getOwnerEmail() {

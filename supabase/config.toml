@@ -13,7 +13,7 @@ major_version = 17
 [studio]
 port = 54343
 
-[inbucket]
+[local_smtp]
 port = 54344
 smtp_port = 54345
 pop3_port = 54346

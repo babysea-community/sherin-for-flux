@@ -16,32 +16,32 @@ Use this guide for changes inside the Sherin starter, especially owner auth, inf
 
 ## Layout
 
-| Path                                   | Purpose                                                                      |
-| -------------------------------------- | ---------------------------------------------------------------------------- |
-| `app/page.tsx`                         | Public Sherin homepage                                                       |
-| `components/gallery`                   | Public homepage gallery                                                      |
-| `components/protected-image.tsx`       | Plain protected image renderer used by homepage and gallery assets           |
-| `app/access`                           | Owner Google OAuth entry point                                               |
-| `app/auth/callback/route.ts`           | Supabase auth callback                                                       |
-| `app/dashboard/studio`                 | Prompt form, provider fields, uploads, and generation start flow             |
-| `app/dashboard/gallery`                | Completed, failed, unavailable, and in-flight generation records             |
-| `app/dashboard/references`             | Uploaded and URL-based reference images                                      |
-| `app/dashboard/usage`                  | Provider, storage, queue, and quota state                                    |
-| `app/dashboard/profile`                | Owner and deployment settings                                                |
-| `app/api/generations/process/route.ts` | Owner/cron generation recovery endpoint                                      |
-| `lib/auth/owner.ts`                    | Owner email authorization                                                    |
-| `lib/inference`                        | Black Forest Labs and BabySea inference adapters                             |
-| `lib/storage`                          | Supabase Storage, AWS S3, Cloudflare R2, and Vercel Blob storage adapters    |
-| `lib/security/csp.ts`                  | CSP and remote image/script allowlists                                       |
-| `supabase/migrations`                  | Owner workspace schema, storage metadata, references, and generation records |
-| `scripts/doctor.mjs`                   | Deployment wiring validator                                                  |
+| Path                                   | Purpose                                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `app/page.tsx`                         | Public Sherin homepage                                                                  |
+| `components/gallery`                   | Public homepage gallery                                                                 |
+| `components/protected-image.tsx`       | Plain protected image renderer used by homepage and gallery assets                      |
+| `app/access`                           | Owner Google OAuth entry point                                                          |
+| `app/auth/callback/route.ts`           | Supabase auth callback                                                                  |
+| `app/dashboard/studio`                 | Prompt form, provider fields, uploads, and generation start flow                        |
+| `app/dashboard/gallery`                | Completed, failed, unavailable, and in-flight generation records                        |
+| `app/dashboard/references`             | Uploaded and URL-based reference images                                                 |
+| `app/dashboard/usage`                  | Provider, storage, queue, and quota state                                               |
+| `app/dashboard/profile`                | Owner and deployment settings                                                           |
+| `app/api/generations/process/route.ts` | Owner/cron generation recovery endpoint                                                 |
+| `lib/auth/owner.ts`                    | Owner email authorization                                                               |
+| `lib/inference`                        | Black Forest Labs and BabySea inference adapters                                        |
+| `lib/storage`                          | Supabase Storage, AWS S3, Backblaze B2, Cloudflare R2, and Vercel Blob storage adapters |
+| `lib/security/csp.ts`                  | CSP and remote image/script allowlists                                                  |
+| `supabase/migrations`                  | Owner workspace schema, storage metadata, references, and generation records            |
+| `scripts/doctor.mjs`                   | Deployment wiring validator                                                             |
 
 ## Conventions
 
 - Sherin is owner-only. The owner allowlist configured in `.env.example` gates dashboard access after Supabase Google OAuth.
 - `INFERENCE_PROVIDER=bfl` uses direct Black Forest Labs execution; `INFERENCE_PROVIDER=babysea` uses the BabySea SDK.
 - Keep every secret described in `.env.example` server-side unless the template explicitly marks it as public.
-- Storage provider choices are `supabase-storage`, `aws-s3`, `cloudflare-r2`, and `vercel-blob`; Supabase Storage is the default and fallback path.
+- Storage provider choices are `aws-s3`, `backblaze-b2`, `cloudflare-r2`, `supabase-storage`, and `vercel-blob`; Supabase Storage is the default and fallback path.
 - Use `ProtectedImage` for public homepage, dashboard screenshot, icon, and gallery image rendering. Do not reintroduce `next/image` for those assets unless explicitly requested.
 - On the public homepage, prefer solid paint for compact mobile cards, icon buttons, and link surfaces. Avoid stacking translucent backgrounds, rings, shadows, backdrop blur, transforms, or transitions on Android-sensitive surfaces.
 - Generation records, prompts, statuses, provider metadata, storage URLs, references, and profile state persist in Supabase behind RLS.

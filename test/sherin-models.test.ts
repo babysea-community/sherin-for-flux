@@ -34,7 +34,7 @@ const BFL_MODEL_EXPECTATIONS = [
   },
   {
     id: 'bfl/flux-2-klein-4b',
-    label: 'Flux 2 Klein 4b',
+    label: 'Flux 2 Klein 4B',
     providerModel: 'flux-2-klein-4b',
   },
   {
@@ -54,7 +54,7 @@ const BFL_MODEL_EXPECTATIONS = [
   },
 ] as const;
 
-describe('Sherin model registry', () => {
+describe('App model registry', () => {
   it('derives provider model options from the central registry', () => {
     expect(BYOK_INFERENCE_PROVIDER_ID).toBe('bfl');
     expect(BYOK_INFERENCE_PROVIDER_LABEL).toBe('Black Forest Labs');
@@ -69,7 +69,7 @@ describe('Sherin model registry', () => {
     expect(getDefaultModelIdForInferenceProvider('bfl')).toBe(DEFAULT_MODEL_ID);
   });
 
-  it('registers BFL image models across the Studio providers', () => {
+  it('registers BFL models across the Studio providers', () => {
     expect(MODEL_IDS).toEqual(BFL_MODEL_EXPECTATIONS.map((model) => model.id));
 
     for (const model of BFL_MODEL_EXPECTATIONS) {

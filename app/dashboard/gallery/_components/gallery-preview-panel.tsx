@@ -60,6 +60,7 @@ export function GalleryPreviewPanel({
           {showLoadingPreview ? <ImageLoadingSkeleton /> : null}
           <video
             src={previewUrl}
+            aria-label={`Generated video for: ${prompt}`}
             className={`absolute inset-0 size-full object-cover transition duration-500 ${
               previewLoaded ? 'opacity-100' : 'opacity-0'
             }`}

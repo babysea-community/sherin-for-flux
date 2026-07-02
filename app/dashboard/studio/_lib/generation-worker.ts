@@ -64,11 +64,7 @@ type ProcessQueueResult = {
 // Kept as a named union so call-sites (`processGenerationQueue` accounting,
 // tests, future structured logging) can exhaustively switch on it.
 type ProcessOutcome =
-  | 'succeeded'
-  | 'failed'
-  | 'unavailable'
-  | 'retry_scheduled'
-  | 'skipped';
+  'succeeded' | 'failed' | 'unavailable' | 'retry_scheduled' | 'skipped';
 
 const GENERATION_UPDATE_RETRY_DELAYS_MS = [0, 250, 1_000] as const;
 // A worker invocation that runs longer than this is assumed to have died

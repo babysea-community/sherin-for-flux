@@ -1,4 +1,4 @@
-/** Sherin app-wide constants. */
+/** App-wide constants. */
 export const APP_NAME = 'Sherin';
 export const APP_PORT = 3011;
 

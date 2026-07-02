@@ -42,9 +42,10 @@ const InputFileUploadPathsSchema = z
   .array(z.string().trim().min(1))
   .max(MAX_INPUT_FILES);
 const StorageProviderIdSchema = z.enum([
-  'supabase-storage',
   'aws-s3',
+  'backblaze-b2',
   'cloudflare-r2',
+  'supabase-storage',
   'vercel-blob',
 ]);
 const StoredInputFileAssetSchema = z.object({

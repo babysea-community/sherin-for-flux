@@ -17,7 +17,10 @@ import {
 import type { Database, Json } from '@/lib/database.types';
 import {
   resolveInferenceProvider,
+  resolveInferenceProviderById,
+  type InferenceCancelResult,
   type InferenceProvider,
+  type InferenceProviderId,
   type InferenceRequest,
 } from '@/lib/inference';
 import { getBabySeaStudioModelSchema } from '@/lib/inference/babysea/server-actions';
@@ -430,7 +433,8 @@ export async function cancelActiveGeneration() {
 
   const canceledAt = new Date().toISOString();
   const message =
-    'Canceled in Sherin by owner. Provider-side jobs already running may still complete.';
+    'Canceled by owner. Provider-side jobs already running may still complete.';
+  const providerCancel = await cancelProviderGeneration(activeGeneration);
   const inputFileBytes = inputFileAssetsByteLengthFromMetadata(
     activeGeneration.metadata,
   );
@@ -439,6 +443,15 @@ export async function cancelActiveGeneration() {
     sherin_failed_at: canceledAt,
     sherin_failed_stage: 'owner_cancelled',
     sherin_stage: 'failed',
+    ...(providerCancel
+      ? {
+          sherin_provider_cancel_attempted: providerCancel.attempted,
+          sherin_provider_cancel_acknowledged: providerCancel.acknowledged,
+          ...(providerCancel.error
+            ? { sherin_provider_cancel_error: providerCancel.error }
+            : {}),
+        }
+      : {}),
   });
 
   const { data, error } = await admin
@@ -502,7 +515,7 @@ function scheduleGenerationQueue(userId: string) {
 async function getActiveGeneration(admin: SupabaseAdminClient, userId: string) {
   const { data, error } = await admin
     .from('generations')
-    .select('id,created_at,metadata')
+    .select('id,created_at,metadata,inference_provider,provider_generation_id')
     .eq('user_id', userId)
     .in('status', ['queued', 'running'])
     .order('created_at', { ascending: false })
@@ -514,6 +527,85 @@ async function getActiveGeneration(admin: SupabaseAdminClient, userId: string) {
   }
 
   return data;
+}
+
+async function cancelProviderGeneration(activeGeneration: {
+  inference_provider: string | null;
+  provider_generation_id: string | null;
+  metadata: Json | null;
+}): Promise<InferenceCancelResult | null> {
+  const providerName = activeGeneration.inference_provider;
+  const providerGenerationId =
+    activeGenerationProviderCancelId(activeGeneration);
+
+  if (!providerName || !providerGenerationId) {
+    return null;
+  }
+
+  let provider: InferenceProvider;
+
+  try {
+    provider = resolveInferenceProviderById(
+      providerName as InferenceProviderId,
+    );
+  } catch (resolveError) {
+    logStudioError('SHERIN_PROVIDER_CANCEL_RESOLVE_FAILED', resolveError);
+
+    return null;
+  }
+
+  if (typeof provider.cancel !== 'function') {
+    return null;
+  }
+
+  try {
+    return await provider.cancel(providerGenerationId);
+  } catch (cancelError) {
+    logStudioError('SHERIN_PROVIDER_CANCEL_FAILED', cancelError);
+
+    return {
+      attempted: true,
+      acknowledged: false,
+      error:
+        cancelError instanceof Error
+          ? cancelError.message
+          : 'Provider cancel failed.',
+    };
+  }
+}
+
+function activeGenerationProviderCancelId(activeGeneration: {
+  provider_generation_id: string | null;
+  metadata: Json | null;
+}): string | null {
+  if (
+    typeof activeGeneration.provider_generation_id === 'string' &&
+    activeGeneration.provider_generation_id.length > 0
+  ) {
+    return activeGeneration.provider_generation_id;
+  }
+
+  const metadata = activeGeneration.metadata;
+
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const record = metadata as Record<string, unknown>;
+
+  for (const key of [
+    'sherin_provider_generation_id',
+    'bfl_task_id',
+    'babysea_generation_id',
+  ]) {
+    const value = record[key];
+
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+  }
+
+  return null;
 }
 
 async function recoverStaleActiveGenerations(

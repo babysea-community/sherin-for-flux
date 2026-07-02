@@ -10,12 +10,13 @@ import {
 import { createByokProvider, isByokProviderConfigured } from './byok-provider';
 
 export type { InferenceProvider, InferenceProviderId } from './types';
+export type { InferenceCancelResult } from './types';
 export type { InferenceRequest, InferenceResult } from './types';
 
 /**
- * Resolve the active inference provider. Sherin auto-detects which provider
+ * Resolve the active inference provider. App auto-detects which provider
  * is configured. If both are present, INFERENCE_PROVIDER decides; otherwise
- * Inference takes precedence because it is Sherin's default stack.
+ * Inference takes precedence because it is app's default stack.
  */
 export function resolveInferenceProvider(): InferenceProvider {
   const configuredPreference = getOptionalEnv('INFERENCE_PROVIDER');

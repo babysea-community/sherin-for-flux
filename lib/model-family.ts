@@ -1,8 +1,8 @@
 /**
- * Sherin model-family registry facade.
+ * App model-family registry facade.
  *
  * Provider-specific model catalogs live beside their direct provider adapter.
- * When cloning Sherin for a new provider family, keep this facade stable and
+ * When cloning the app for a new provider family, keep this facade stable and
  * swap only the provider family import plus the direct provider shim.
  */
 import {

@@ -492,7 +492,7 @@ function GalleryCard({
         <ProtectedImage
           className="block h-full w-full object-cover transition duration-500 ease-out group-hover:scale-110 group-[.touch-active]:scale-110"
           src={item.imageUrl}
-          alt={`Sherin private generative media gallery output ${item.id}`}
+          alt={`Private generative media gallery output ${item.id}`}
           width={item.width}
           height={item.height}
           decoding="async"

@@ -41,6 +41,7 @@ Private workspace for generative media with own key, domain, and storage.
 [![Black Forest Labs](https://custom-icon-badges.demolab.com/badge/black_forest_labs-07130E?style=for-the-badge&logo=blackforestlabs&logoColor=white)](https://bfl.ai)
 [![Supabase](https://custom-icon-badges.demolab.com/badge/supabase-249361?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 [![AWS S3](https://custom-icon-badges.demolab.com/badge/aws_s3-3F8624?style=for-the-badge&logo=aws-s3-2&logoColor=white)](https://docs.aws.amazon.com/s3)
+[![Backblaze B2](https://custom-icon-badges.demolab.com/badge/backblaze_b2-E21E29?style=for-the-badge&logo=backblaze&logoColor=white)](https://www.backblaze.com/docs)
 [![Cloudflare R2](https://custom-icon-badges.demolab.com/badge/cloudflare_r2-F38020?style=for-the-badge&logo=cloudflare-r2&logoColor=white)](https://www.cloudflare.com)
 [![Vercel Blob](https://custom-icon-badges.demolab.com/badge/vercel_blob-E46000?style=for-the-badge&logo=vercel-blob-3)](https://vercel.com/docs/vercel-blob)
 [![Sentry](https://custom-icon-badges.demolab.com/badge/sentry-181225?style=for-the-badge&logo=sentry&logoColor=white)](https://sentry.io)
@@ -133,7 +134,7 @@ BabySea model schemas are published at [babysea.ai/model-schema](https://babysea
 
 Use [`.env.example`](.env.example) as the source of truth for storage provider, quota, worker, and monitoring configuration.
 
-Supabase Storage is the default and fallback storage path. AWS S3, Cloudflare R2, and Vercel Blob are available when you want generated media in your own bucket or blob store.
+Supabase Storage is the default and fallback storage path. AWS S3, Backblaze B2, Cloudflare R2, and Vercel Blob are available when you want generated media in your own bucket or blob store. Leave the Backblaze B2 env values blank unless you intentionally set `STORAGE_PROVIDER=backblaze-b2`.
 
 ## Supported models
 
@@ -161,11 +162,11 @@ Supported model names and provider fields are registered in [`lib/model-family.t
 
 ## Runtime
 
-- Sherin is owner-only. Supabase Google OAuth signs users in, and the configured owner allowlist gates dashboard access.
+- The project is owner-only. Supabase Google OAuth signs users in, and the configured owner allowlist gates dashboard access.
 - Provider credentials, storage credentials, Supabase service role keys, Sentry auth tokens, and cron secrets stay server-side.
 - Generation records, prompts, statuses, provider metadata, storage URLs, reference images, and profile state persist in Supabase Postgres.
 - Studio, Gallery, References, and Usage can process queued/running generations. `/api/generations/process` can also be called by cron with the worker bearer secret configured from [`.env.example`](.env.example).
-- Sherin is not a managed BabySea service, commercial support package, hosting service, billing starter, credit ledger, provider marketplace, or multi-tenant team workspace.
+- The project is not a managed BabySea service, commercial support package, hosting service, billing starter, credit ledger, provider marketplace, or multi-tenant team workspace.
 
 ## Deployment
 

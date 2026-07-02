@@ -56,8 +56,7 @@ export class InvalidInputFileUploadError extends Error {
   constructor(
     message: string,
     readonly feedback:
-      | 'invalid_input'
-      | 'input_upload_invalid' = 'input_upload_invalid',
+      'invalid_input' | 'input_upload_invalid' = 'input_upload_invalid',
     readonly cause?: unknown,
   ) {
     super(message);

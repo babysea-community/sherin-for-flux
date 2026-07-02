@@ -19,12 +19,7 @@
     "developer-tools",
     "creative-tools",
     "generative-ai",
-    "generative-media",
-    "supabase",
-    "vercel",
-    "cloudflare",
-    "aws",
-    "sentry"
+    "generative-media"
   ],
   "engines": {
     "node": ">=24.14.0 <25"

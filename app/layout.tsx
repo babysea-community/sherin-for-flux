@@ -27,11 +27,6 @@ export const metadata: Metadata = {
     'creative-tools',
     'generative-ai',
     'generative-media',
-    'supabase',
-    'vercel',
-    'cloudflare',
-    'aws',
-    'sentry',
   ],
   icons: {
     icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],

@@ -110,7 +110,7 @@ function withOptionalSentry(config: NextConfig): NextConfig {
     });
   } catch (error) {
     console.warn(
-      '[sherin] Sentry DSN set but @sentry/nextjs failed to load. Continuing without Sentry build wrapper.',
+      'Sentry DSN set but @sentry/nextjs failed to load. Continuing without Sentry build wrapper.',
       error,
     );
     return config;

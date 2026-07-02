@@ -49,14 +49,14 @@ export function humanizeGenerationError(input: {
   ) {
     return {
       title: `${providerLabel} is out of credits`,
-      description: `Add credits in your ${providerLabel} dashboard, then try again. Sherin only forwards the request; the credits are billed by ${providerLabel}.`,
+      description: `Add credits in your ${providerLabel} dashboard, then try again. App only forwards the request; the credits are billed by ${providerLabel}.`,
     };
   }
 
   if (status === 401 || status === 403) {
     return {
       title: `${providerLabel} rejected the API key`,
-      description: `Sherin's request was refused. Check that your ${providerLabel} API key is set, active, and authorized for this model, then try again.`,
+      description: `App's request was refused. Check that your ${providerLabel} API key is set, active, and authorized for this model, then try again.`,
     };
   }
 
@@ -108,14 +108,14 @@ export function humanizeGenerationError(input: {
   ) {
     return {
       title: `${providerLabel} had a temporary problem`,
-      description: `Sherin retried automatically but ${providerLabel} kept failing. Please try again in a moment.`,
+      description: `App retried automatically but ${providerLabel} kept failing. Please try again in a moment.`,
     };
   }
 
   if (/cancel/i.test(lowerMessage)) {
     return {
       title: 'Generation canceled',
-      description: 'You canceled this generation in Sherin.',
+      description: 'You canceled this generation.',
     };
   }
 
@@ -123,7 +123,7 @@ export function humanizeGenerationError(input: {
     title: 'Generation failed',
     description:
       detail ??
-      `Sherin could not complete this request with ${providerLabel}. See the technical details below.`,
+      `App could not complete this request with ${providerLabel}. See the technical details below.`,
   };
 }
 

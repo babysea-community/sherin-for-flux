@@ -5,7 +5,7 @@ import { signInWithGoogle } from './_lib/server-actions';
 
 export const metadata: Metadata = {
   title: 'Owner Access',
-  description: 'Sign in to your Sherin workspace.',
+  description: 'Sign in to your private workspace.',
   robots: { index: false, follow: false },
 };
 

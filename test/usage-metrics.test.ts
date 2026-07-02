@@ -29,6 +29,16 @@ describe('createUsageMetrics storage health', () => {
     expect(metrics.storage.fallbackTargets).toEqual(['Supabase Storage']);
   });
 
+  it('formats Backblaze B2 as a primary storage provider', () => {
+    const metrics = createUsageMetrics(
+      [row({ storage_provider: 'backblaze-b2' })],
+      'backblaze-b2',
+    );
+
+    expect(metrics.storage.primaryProvider).toBe('Backblaze B2');
+    expect(metrics.storage.fallbackTargets).toEqual(['Supabase Storage']);
+  });
+
   it('uses Supabase Storage for both primary and fallback when it is the active provider', () => {
     const metrics = createUsageMetrics(
       [row({ storage_provider: 'supabase-storage' })],

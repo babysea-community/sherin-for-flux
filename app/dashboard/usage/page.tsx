@@ -18,8 +18,9 @@ import { getUser } from '@/lib/database/server-actions';
 import { getGenerationRequestSnapshot } from '@/lib/generation/display';
 import { InlineBlackForestLabsLight } from '@/components/icons/inline-model';
 import {
-  InlineAwsS3Storage,
-  InlineCloudflareR2Storage,
+  InlineAwsS3,
+  InlineBackblazeB2,
+  InlineCloudflareR2,
   InlineSupabaseStorage,
   InlineVercelBlob,
 } from '@/components/icons/inline-storage';
@@ -30,7 +31,7 @@ import { createUsageMetrics, type UsageMetrics } from './_lib/usage-metrics';
 
 export const metadata: Metadata = {
   title: 'Usage',
-  description: 'Generation metrics for your Sherin workspace.',
+  description: 'Generation metrics for your private workspace.',
   robots: { index: false, follow: false },
 };
 
@@ -453,24 +454,23 @@ function StorageProviderValue({ provider }: { provider: string }) {
 }
 
 function storageProviderIcon(provider: string | null) {
-  if (provider === 'supabase-storage') {
-    return (
-      <InlineSupabaseStorage className="size-4 shrink-0" aria-hidden="true" />
-    );
+  if (provider === 'aws-s3') {
+    return <InlineAwsS3 className="size-4 shrink-0" aria-hidden="true" />;
   }
 
-  if (provider === 'aws-s3') {
-    return (
-      <InlineAwsS3Storage className="size-4 shrink-0" aria-hidden="true" />
-    );
+  if (provider === 'backblaze-b2') {
+    return <InlineBackblazeB2 className="size-4 shrink-0" aria-hidden="true" />;
   }
 
   if (provider === 'cloudflare-r2') {
     return (
-      <InlineCloudflareR2Storage
-        className="size-4 shrink-0"
-        aria-hidden="true"
-      />
+      <InlineCloudflareR2 className="size-4 shrink-0" aria-hidden="true" />
+    );
+  }
+
+  if (provider === 'supabase-storage') {
+    return (
+      <InlineSupabaseStorage className="size-4 shrink-0" aria-hidden="true" />
     );
   }
 
@@ -652,15 +652,15 @@ function normalizeStorageProvider(provider: string) {
     .toLowerCase()
     .replace(/\s*\(fallback\)\s*$/, '');
 
-  if (
-    normalizedProvider === 'supabase-storage' ||
-    normalizedProvider === 'supabase storage'
-  ) {
-    return 'supabase-storage';
-  }
-
   if (normalizedProvider === 'aws-s3' || normalizedProvider === 'aws s3') {
     return 'aws-s3';
+  }
+
+  if (
+    normalizedProvider === 'backblaze-b2' ||
+    normalizedProvider === 'backblaze b2'
+  ) {
+    return 'backblaze-b2';
   }
 
   if (
@@ -668,6 +668,13 @@ function normalizeStorageProvider(provider: string) {
     normalizedProvider === 'cloudflare r2'
   ) {
     return 'cloudflare-r2';
+  }
+
+  if (
+    normalizedProvider === 'supabase-storage' ||
+    normalizedProvider === 'supabase storage'
+  ) {
+    return 'supabase-storage';
   }
 
   if (

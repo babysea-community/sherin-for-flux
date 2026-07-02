@@ -34,7 +34,7 @@ describe('BabySea Studio model schemas', () => {
     babySeaMock.models.mockReset();
   });
 
-  it('omits Sherin models that are absent from the BabySea library', async () => {
+  it('omits app models that are absent from the BabySea library', async () => {
     const absentModel = MODEL_IDS.find((model) => model !== DEFAULT_MODEL_ID);
 
     expect(absentModel).toBeDefined();

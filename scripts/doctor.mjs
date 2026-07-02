@@ -2,15 +2,16 @@
 // @ts-nocheck
 
 import { existsSync, readFileSync } from 'node:fs';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 
 const ENV_FILES = ['.env.local', '.env'];
 const INFERENCE_PROVIDERS = new Set(['bfl', 'babysea']);
 const STORAGE_PROVIDERS = new Set([
-  'supabase-storage',
   'aws-s3',
+  'backblaze-b2',
   'cloudflare-r2',
+  'supabase-storage',
   'vercel-blob',
 ]);
 const SHERIN_REPOSITORY_URL =
@@ -78,16 +79,27 @@ const storageRequirements = {
     'CLOUDFLARE_R2_CUSTOM_DOMAIN_URL',
   ],
 };
+const BACKBLAZE_B2_KEY_ID_ENV_NAMES = ['BACKBLAZE_B2_KEY_ID', 'B2_KEY_ID'];
+const BACKBLAZE_B2_APPLICATION_KEY_ENV_NAMES = [
+  'BACKBLAZE_B2_APPLICATION_KEY',
+  'BACKBLAZE_B2_APP_KEY',
+  'B2_APP_KEY',
+];
+const BACKBLAZE_B2_BUCKET_NAME_ENV_NAMES = [
+  'BACKBLAZE_B2_BUCKET_NAME',
+  'B2_BUCKET_NAME',
+];
 const storageAvailability = {
-  'supabase-storage': true,
   'aws-s3': hasAll(storageRequirements['aws-s3']),
+  'backblaze-b2': hasBackblazeB2Config(),
   'cloudflare-r2': hasAll(storageRequirements['cloudflare-r2']),
+  'supabase-storage': true,
   'vercel-blob': Boolean(optional('BLOB_READ_WRITE_TOKEN')),
 };
 
 if (preferredStorage && !STORAGE_PROVIDERS.has(preferredStorage)) {
   fail(
-    'STORAGE_PROVIDER must be supabase-storage, aws-s3, cloudflare-r2, or vercel-blob.',
+    'STORAGE_PROVIDER must be aws-s3, backblaze-b2, cloudflare-r2, supabase-storage, or vercel-blob.',
   );
 } else if (preferredStorage && !storageAvailability[preferredStorage]) {
   fail('Selected storage provider is missing required env values.');
@@ -97,6 +109,10 @@ if (preferredStorage && !STORAGE_PROVIDERS.has(preferredStorage)) {
 
 if (hasAny(storageRequirements['aws-s3'])) {
   checkRequiredGroup('aws-s3', storageRequirements['aws-s3']);
+}
+
+if (hasAnyBackblazeB2Config()) {
+  checkBackblazeB2Config();
 }
 
 if (hasAny(storageRequirements['cloudflare-r2'])) {
@@ -203,6 +219,18 @@ function optional(name) {
   const value = env[name]?.trim();
 
   return value ? value : undefined;
+}
+
+function firstOptional(names) {
+  for (const name of names) {
+    const value = optional(name);
+
+    if (value) {
+      return value;
+    }
+  }
+
+  return undefined;
 }
 
 function checkRequired(name) {
@@ -428,6 +456,40 @@ function hasAny(names) {
   return names.some((name) => Boolean(optional(name)));
 }
 
+function hasBackblazeB2Config() {
+  return Boolean(
+    firstOptional(BACKBLAZE_B2_KEY_ID_ENV_NAMES) &&
+    firstOptional(BACKBLAZE_B2_APPLICATION_KEY_ENV_NAMES) &&
+    firstOptional(BACKBLAZE_B2_BUCKET_NAME_ENV_NAMES),
+  );
+}
+
+function hasAnyBackblazeB2Config() {
+  return Boolean(
+    firstOptional(BACKBLAZE_B2_KEY_ID_ENV_NAMES) ||
+    firstOptional(BACKBLAZE_B2_APPLICATION_KEY_ENV_NAMES) ||
+    firstOptional(BACKBLAZE_B2_BUCKET_NAME_ENV_NAMES),
+  );
+}
+
+function checkBackblazeB2Config() {
+  const missing = [
+    firstOptional(BACKBLAZE_B2_KEY_ID_ENV_NAMES)
+      ? null
+      : 'BACKBLAZE_B2_KEY_ID or B2_KEY_ID',
+    firstOptional(BACKBLAZE_B2_APPLICATION_KEY_ENV_NAMES)
+      ? null
+      : 'BACKBLAZE_B2_APPLICATION_KEY, BACKBLAZE_B2_APP_KEY, or B2_APP_KEY',
+    firstOptional(BACKBLAZE_B2_BUCKET_NAME_ENV_NAMES)
+      ? null
+      : 'BACKBLAZE_B2_BUCKET_NAME or B2_BUCKET_NAME',
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    fail(`backblaze-b2 requires ${missing.join('; ')}.`);
+  }
+}
+
 function checkRequiredGroup(provider, names) {
   const missing = names.filter((name) => !optional(name));
 
@@ -618,6 +680,8 @@ async function probeStorage() {
       key,
       payload,
     );
+  } else if (provider === 'backblaze-b2') {
+    await probeBackblazeB2Storage(key, payload);
   } else if (provider === 'cloudflare-r2') {
     await probeS3CompatibleStorage(
       {
@@ -642,6 +706,242 @@ async function probeStorage() {
     payload,
     'Supabase Storage fallback',
   );
+}
+
+async function probeBackblazeB2Storage(key, payload) {
+  const keyId = firstOptional(BACKBLAZE_B2_KEY_ID_ENV_NAMES);
+  const applicationKey = firstOptional(BACKBLAZE_B2_APPLICATION_KEY_ENV_NAMES);
+  const bucketName = firstOptional(BACKBLAZE_B2_BUCKET_NAME_ENV_NAMES);
+
+  if (!keyId || !applicationKey || !bucketName) {
+    fail(
+      'Backblaze B2 smoke test requires BACKBLAZE_B2_KEY_ID/B2_KEY_ID, BACKBLAZE_B2_APPLICATION_KEY/B2_APP_KEY, and BACKBLAZE_B2_BUCKET_NAME/B2_BUCKET_NAME.',
+    );
+    return;
+  }
+
+  let authorization;
+  let bucket;
+  let uploadedFileName = null;
+
+  try {
+    authorization = await authorizeBackblazeAccount(keyId, applicationKey);
+    bucket = await resolveBackblazeBucket(authorization, bucketName);
+    const upload = await backblazeApi(authorization, 'b2_get_upload_url', {
+      bucketId: bucket.bucketId,
+    });
+    const fileName = key.replace(/^\/+/, '');
+    const uploadResponse = await fetch(upload.uploadUrl, {
+      body: Buffer.from(payload),
+      headers: {
+        Authorization: upload.authorizationToken,
+        'Content-Length': String(payload.byteLength),
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Bz-Content-Sha1': sha1Hex(payload),
+        'X-Bz-File-Name': encodeB2Path(fileName),
+      },
+      method: 'POST',
+    });
+    const uploaded = await readBackblazeJson(uploadResponse, 'b2_upload_file');
+    uploadedFileName = uploaded.fileName || fileName;
+    const downloadAuth = await backblazeApi(
+      authorization,
+      'b2_get_download_authorization',
+      {
+        bucketId: bucket.bucketId,
+        fileNamePrefix: uploadedFileName,
+        validDurationInSeconds: 3600,
+      },
+    );
+    const downloadUrl = `${authorization.downloadUrl}/file/${encodeURIComponent(bucketName)}/${encodeB2Path(uploadedFileName)}?Authorization=${encodeURIComponent(downloadAuth.authorizationToken)}`;
+    const downloadResponse = await fetch(downloadUrl, {
+      cache: 'no-store',
+      redirect: 'error',
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!downloadResponse.ok) {
+      throw new Error(`download returned HTTP ${downloadResponse.status}`);
+    }
+
+    await assertDownloadedPayload(
+      'Backblaze B2 smoke test',
+      await downloadResponse.blob(),
+      payload,
+    );
+    await deleteBackblazeFileVersions(
+      authorization,
+      bucket.bucketId,
+      uploadedFileName,
+    );
+    uploadedFileName = null;
+    pass('Backblaze B2 Put/Get/Delete smoke test passed.');
+  } catch {
+    fail('Backblaze B2 smoke test failed; inspect provider logs for details.');
+
+    if (authorization && bucket && uploadedFileName) {
+      try {
+        await deleteBackblazeFileVersions(
+          authorization,
+          bucket.bucketId,
+          uploadedFileName,
+        );
+      } catch {
+        // Best effort cleanup only.
+      }
+    }
+  }
+}
+
+async function authorizeBackblazeAccount(keyId, applicationKey) {
+  const response = await fetch(
+    'https://api.backblazeb2.com/b2api/v3/b2_authorize_account',
+    {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${keyId}:${applicationKey}`).toString('base64')}`,
+      },
+    },
+  );
+
+  return normalizeBackblazeAuthorization(
+    await readBackblazeJson(response, 'b2_authorize_account'),
+  );
+}
+
+function normalizeBackblazeAuthorization(response) {
+  const storageApi = response.apiInfo?.storageApi;
+  const apiUrl = storageApi?.apiUrl ?? response.apiUrl;
+  const downloadUrl = storageApi?.downloadUrl ?? response.downloadUrl;
+
+  if (!apiUrl || !downloadUrl) {
+    throw new Error(
+      'Backblaze B2 authorization response did not include storage API endpoints.',
+    );
+  }
+
+  return {
+    accountId: response.accountId,
+    allowed: {
+      bucketId: storageApi?.bucketId ?? response.allowed?.bucketId ?? null,
+      bucketName:
+        storageApi?.bucketName ?? response.allowed?.bucketName ?? null,
+    },
+    apiUrl,
+    authorizationToken: response.authorizationToken,
+    downloadUrl,
+  };
+}
+
+async function resolveBackblazeBucket(authorization, bucketName) {
+  const explicitBucketId = firstOptional([
+    'BACKBLAZE_B2_BUCKET_ID',
+    'B2_BUCKET_ID',
+  ]);
+
+  if (explicitBucketId) {
+    return { bucketId: explicitBucketId, bucketName };
+  }
+
+  if (
+    authorization.allowed?.bucketName === bucketName &&
+    authorization.allowed.bucketId
+  ) {
+    return {
+      bucketId: authorization.allowed.bucketId,
+      bucketName,
+    };
+  }
+
+  const response = await backblazeApi(authorization, 'b2_list_buckets', {
+    accountId: authorization.accountId,
+    bucketName,
+  });
+  const bucket = response.buckets?.find(
+    (candidate) => candidate.bucketName === bucketName,
+  );
+
+  if (!bucket) {
+    throw new Error('Backblaze B2 bucket not found.');
+  }
+
+  return bucket;
+}
+
+async function deleteBackblazeFileVersions(authorization, bucketId, fileName) {
+  let nextFileName = fileName;
+  let nextFileId;
+
+  while (nextFileName) {
+    const response = await backblazeApi(
+      authorization,
+      'b2_list_file_versions',
+      {
+        bucketId,
+        maxFileCount: 100,
+        prefix: fileName,
+        startFileId: nextFileId,
+        startFileName: nextFileName,
+      },
+    );
+    const files = response.files ?? [];
+
+    for (const file of files) {
+      if (file.fileName !== fileName) {
+        continue;
+      }
+
+      await backblazeApi(authorization, 'b2_delete_file_version', {
+        fileId: file.fileId,
+        fileName: file.fileName,
+      });
+    }
+
+    if (!response.nextFileName || !response.nextFileName.startsWith(fileName)) {
+      break;
+    }
+
+    nextFileName = response.nextFileName;
+    nextFileId = response.nextFileId;
+  }
+}
+
+async function backblazeApi(authorization, operation, body) {
+  const response = await fetch(
+    `${authorization.apiUrl}/b2api/v3/${operation}`,
+    {
+      body: JSON.stringify(body),
+      headers: {
+        Authorization: authorization.authorizationToken,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+    },
+  );
+
+  return readBackblazeJson(response, operation);
+}
+
+async function readBackblazeJson(response, operation) {
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(
+      `Backblaze B2 ${operation} failed (${response.status}): ${text || response.statusText}`,
+    );
+  }
+
+  return text ? JSON.parse(text) : {};
+}
+
+function encodeB2Path(fileName) {
+  return fileName
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+}
+
+function sha1Hex(data) {
+  return createHash('sha1').update(data).digest('hex');
 }
 
 async function probeSupabaseStorage(key, payload, label) {

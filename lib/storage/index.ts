@@ -8,15 +8,19 @@ import type {
   StoreInput,
   StoreResult,
 } from './types';
-import { createSupabaseStorageProvider } from './supabase-storage/server-actions';
 import {
   createAwsS3StorageProvider,
   isAwsS3StorageConfigured,
 } from './aws-s3/server-actions';
 import {
+  createBackblazeB2StorageProvider,
+  isBackblazeB2StorageConfigured,
+} from './backblaze-b2/server-actions';
+import {
   createCloudflareR2StorageProvider,
   isCloudflareR2StorageConfigured,
 } from './cloudflare-r2/server-actions';
+import { createSupabaseStorageProvider } from './supabase-storage/server-actions';
 import {
   createVercelBlobProvider,
   isVercelBlobConfigured,
@@ -85,7 +89,7 @@ export function resolveStorageProvider(): StorageProvider {
 
   if (configuredPreference && !preferred) {
     throw new Error(
-      'STORAGE_PROVIDER must be supabase-storage, aws-s3, cloudflare-r2, or vercel-blob.',
+      'STORAGE_PROVIDER must be aws-s3, backblaze-b2, cloudflare-r2, supabase-storage, or vercel-blob.',
     );
   }
 
@@ -116,9 +120,10 @@ export function getStorageProviderStatus() {
     preferred,
     active,
     availability: {
-      'supabase-storage': true,
       'aws-s3': isAwsS3StorageConfigured(),
+      'backblaze-b2': isBackblazeB2StorageConfigured(),
       'cloudflare-r2': isCloudflareR2StorageConfigured(),
+      'supabase-storage': true,
       'vercel-blob': isVercelBlobConfigured(),
     },
   };
@@ -126,7 +131,7 @@ export function getStorageProviderStatus() {
 
 /**
  * Download a remote asset and persist it through the active storage provider.
- * If that write fails, Sherin falls back to its own Supabase bucket before
+ * If that write fails, app falls back to its own Supabase bucket before
  * leaving the provider-hosted URL as the only usable image.
  */
 export async function persistRemoteAsset(input: {
@@ -456,6 +461,8 @@ async function fetchGeneratedAsset(url: URL) {
         return response;
       }
 
+      await response.body?.cancel().catch(() => {});
+
       const downloadError = new Error(
         `Could not download generated asset: ${response.status}`,
       );
@@ -544,12 +551,14 @@ async function storeGeneratedAssetWithRetry(
 
 function createProvider(id: StorageProviderId): StorageProvider {
   switch (id) {
-    case 'supabase-storage':
-      return createSupabaseStorageProvider();
     case 'aws-s3':
       return createAwsS3StorageProvider();
+    case 'backblaze-b2':
+      return createBackblazeB2StorageProvider();
     case 'cloudflare-r2':
       return createCloudflareR2StorageProvider();
+    case 'supabase-storage':
+      return createSupabaseStorageProvider();
     case 'vercel-blob':
       return createVercelBlobProvider();
   }
@@ -565,9 +574,10 @@ function normalizePreference(
   const lower = value.trim().toLowerCase();
 
   if (
-    lower === 'supabase-storage' ||
     lower === 'aws-s3' ||
+    lower === 'backblaze-b2' ||
     lower === 'cloudflare-r2' ||
+    lower === 'supabase-storage' ||
     lower === 'vercel-blob'
   ) {
     return lower;

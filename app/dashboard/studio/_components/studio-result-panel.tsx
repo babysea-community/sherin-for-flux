@@ -93,6 +93,7 @@ export function StudioResultPanel({
             {showLoadingPreview ? <ImageLoadingSkeleton /> : null}
             <video
               src={previewUrl}
+              aria-label="Generated video"
               className={`absolute inset-0 size-full object-cover transition duration-500 ${
                 previewLoaded ? 'opacity-100' : 'opacity-0'
               }`}

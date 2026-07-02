@@ -59,7 +59,7 @@ const STUDIO_TOASTS: Record<string, Omit<StudioToast, 'id'>> = {
   input_upload_failed: {
     type: 'error',
     message:
-      'Input image upload failed before generation started. Check Supabase Storage and try again.',
+      'Input image upload failed before generation started. Check your storage provider and try again.',
   },
   input_upload_invalid: {
     type: 'warning',
@@ -69,12 +69,12 @@ const STUDIO_TOASTS: Record<string, Omit<StudioToast, 'id'>> = {
   generation_failed: {
     type: 'error',
     message:
-      'Generation did not finish inside Sherin. The result keeps the provider context and stored error.',
+      'Generation did not finish. The result keeps the provider context and stored error.',
   },
   generation_cancelled: {
     type: 'warning',
     message:
-      'Generation canceled in Sherin. Provider-side jobs already running may still finish.',
+      'Generation canceled. Provider-side jobs already running may still finish.',
   },
 };
 

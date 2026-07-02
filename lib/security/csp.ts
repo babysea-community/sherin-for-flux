@@ -31,8 +31,8 @@ export const API_SECURITY_HEADERS = [
 ];
 
 /**
- * Builds Sherin's static CSP from the active deployment environment.
- * Sherin is a single private starter, so a small static policy in next.config
+ * Builds app's static CSP from the active deployment environment.
+ * App is a single private starter, so a small static policy in next.config
  * keeps the same allowlist discipline without needing middleware nonce
  * plumbing. The CSP applies to HTML responses; JSON API responses under
  * /api/* receive Cache-Control headers via API_SECURITY_HEADERS.
@@ -70,16 +70,21 @@ function buildContentSecurityPolicy() {
     connectHosts,
     process.env.NEXT_PUBLIC_SUPABASE_URL,
   );
-  appendHostFromUrl(imageHosts, process.env.NEXT_PUBLIC_SUPABASE_URL);
-  appendR2PublicReadHostFromUrl(
-    imageHosts,
-    process.env.CLOUDFLARE_R2_CUSTOM_DOMAIN_URL,
-  );
   appendAwsS3PublicReadHostFromUrl(imageHosts, {
     bucket: process.env.AWS_S3_BUCKET_NAME,
     endpointUrl: process.env.AWS_S3_ENDPOINT_URL,
     region: process.env.AWS_S3_REGION,
   });
+
+  if (isBackblazeB2Configured()) {
+    imageHosts.add('https://*.backblazeb2.com');
+  }
+
+  appendR2PublicReadHostFromUrl(
+    imageHosts,
+    process.env.CLOUDFLARE_R2_CUSTOM_DOMAIN_URL,
+  );
+  appendHostFromUrl(imageHosts, process.env.NEXT_PUBLIC_SUPABASE_URL);
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     imageHosts.add('https://*.public.blob.vercel-storage.com');
@@ -159,6 +164,18 @@ function appendHostFromUrl(set: Set<string>, raw: string | undefined) {
   } catch {
     // ignore invalid URLs; CSP simply will not include them.
   }
+}
+
+function isBackblazeB2Configured() {
+  const keyId = process.env.BACKBLAZE_B2_KEY_ID ?? process.env.B2_KEY_ID;
+  const applicationKey =
+    process.env.BACKBLAZE_B2_APPLICATION_KEY ??
+    process.env.BACKBLAZE_B2_APP_KEY ??
+    process.env.B2_APP_KEY;
+  const bucketName =
+    process.env.BACKBLAZE_B2_BUCKET_NAME ?? process.env.B2_BUCKET_NAME;
+
+  return Boolean(keyId?.trim() && applicationKey?.trim() && bucketName?.trim());
 }
 
 function appendR2PublicReadHostFromUrl(

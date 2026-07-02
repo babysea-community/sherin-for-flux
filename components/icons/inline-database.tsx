@@ -23,7 +23,7 @@ export function InlineAwsAurora({
       className={cn(className)}
       {...props}
     >
-      <title>Amazon Aurora</title>
+      <title>AWS Aurora</title>
       <defs>
         <linearGradient
           x1="0%"

@@ -10,7 +10,7 @@ import { getUser } from '@/lib/database/server-actions';
 
 export const dynamic = 'force-dynamic';
 // 60s is the maximum that works on every Vercel tier (Hobby caps at 60s,
-// Pro at 300s, Enterprise at 900s). Sherin's inference providers are tuned
+// Pro at 300s, Enterprise at 900s). App's inference providers are tuned
 // to a ~45s polling budget so a single invocation completes within this
 // window; longer generations resume via the worker's stale-running reclaim
 // path on the next cron tick. Operators on Pro+ can raise this safely.

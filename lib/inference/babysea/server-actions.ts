@@ -21,6 +21,7 @@ import {
   resolveBabySeaOutputFormat,
 } from './models';
 import type {
+  InferenceCancelResult,
   InferenceGenerateOptions,
   InferenceProvider,
   InferenceRequest,
@@ -108,6 +109,14 @@ export function createBabySeaProvider(): InferenceProvider {
   return {
     id: 'babysea',
     label: 'BabySea',
+    extractProviderGenerationId(metadata) {
+      const value = metadata.babysea_generation_id;
+
+      return typeof value === 'string' && value.length > 0 ? value : null;
+    },
+    async cancel(providerGenerationId: string): Promise<InferenceCancelResult> {
+      return cancelBabySeaGeneration(providerGenerationId);
+    },
     async generate(
       request: InferenceRequest,
       options,
@@ -415,6 +424,32 @@ function firstOutputUrl(outputs: Generation['generation_output_file']) {
       (value) => typeof value === 'string' && value.startsWith('https://'),
     ) ?? null
   );
+}
+
+async function cancelBabySeaGeneration(
+  generationId: string,
+): Promise<InferenceCancelResult> {
+  if (!generationId) {
+    return {
+      attempted: false,
+      acknowledged: false,
+      error: 'Missing BabySea generation id.',
+    };
+  }
+
+  try {
+    await createBabySeaClient().cancelGeneration(generationId);
+
+    return { attempted: true, acknowledged: true };
+  } catch (error) {
+    // BabySea returns a non-cancelable error once the generation has finished;
+    // treat every failure as a best-effort no-op so the local cancel proceeds.
+    return {
+      attempted: true,
+      acknowledged: false,
+      error: error instanceof Error ? error.message : 'BabySea cancel failed.',
+    };
+  }
 }
 
 function createBabySeaClient() {
