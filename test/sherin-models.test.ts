@@ -39,7 +39,7 @@ const BFL_MODEL_EXPECTATIONS = [
   },
   {
     id: 'bfl/flux-2-klein-9b',
-    label: 'Flux 2 Klein 9b',
+    label: 'Flux 2 Klein 9B',
     providerModel: 'flux-2-klein-9b',
   },
   {

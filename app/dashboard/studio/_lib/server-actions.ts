@@ -595,7 +595,7 @@ function activeGenerationProviderCancelId(activeGeneration: {
 
   for (const key of [
     'sherin_provider_generation_id',
-    'bfl_task_id',
+    'bfl_request_id',
     'babysea_generation_id',
   ]) {
     const value = record[key];
