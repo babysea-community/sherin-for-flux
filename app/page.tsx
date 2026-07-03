@@ -17,7 +17,7 @@ import {
   InlineRenderLight,
   InlineVercelLight,
 } from '@/components/icons/inline-host';
-import { InlineBlackForestLabsLight } from '@/components/icons/inline-inference';
+import { InlineBlackForestLabsLight } from '@/components/icons/inline-model';
 import { InlineGitHub } from '@/components/icons/inline-git';
 import {
   InlineAwsS3,
