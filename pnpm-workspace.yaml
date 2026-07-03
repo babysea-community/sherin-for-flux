@@ -34,7 +34,7 @@ catalog:
   server-only: 0.0.1
   simple-icons: 16.21.0
   sonner: 2.0.7
-  supabase: 2.108.0
+  supabase: 2.109.0
   tailwind-merge: 3.6.0
   tailwindcss: 4.3.0
   typescript: 6.0.3
