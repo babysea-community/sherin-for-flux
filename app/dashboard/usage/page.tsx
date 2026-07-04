@@ -4,7 +4,6 @@ import {
   Bot,
   CalendarDays,
   CalendarRange,
-  Cpu,
   HardDrive,
   Image,
   ImageMinus,
@@ -27,7 +26,7 @@ import {
 import { formatDate } from '@/lib/utils';
 
 import { GenerationQueueKicker } from '../_components/generation-queue-kicker';
-import { createUsageMetrics, type UsageMetrics } from './_lib/usage-metrics';
+import { createUsageMetrics } from './_lib/usage-metrics';
 
 export const metadata: Metadata = {
   title: 'Usage',
@@ -194,7 +193,7 @@ export default async function UsagePage() {
         />
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
+      <section>
         <InsightCard
           icon={
             <MetricIcon tone="info">
@@ -233,10 +232,6 @@ export default async function UsagePage() {
             value={formatNumber(metrics.storage.unavailable)}
           />
         </InsightCard>
-
-        {metrics.providerMix.length > 1 ? (
-          <ProviderMixCard providers={metrics.providerMix} />
-        ) : null}
       </section>
     </main>
   );
@@ -359,19 +354,22 @@ function UsageKpiCard({
 }
 
 function FavoriteModelValue({ model }: { model: string }) {
-  const hasModel = model !== 'No outputs yet';
+  const Icon = modelVendorIcon(model);
 
   return (
     <span className="inline-flex w-full max-w-full min-w-0 items-center gap-3">
-      {hasModel ? (
-        <InlineBlackForestLabsLight
-          className="h-5 w-7 shrink-0"
-          aria-hidden="true"
-        />
-      ) : null}
+      {Icon ? <Icon className="size-5 shrink-0" aria-hidden="true" /> : null}
       <span className="block min-w-0 truncate">{model}</span>
     </span>
   );
+}
+
+function modelVendorIcon(modelId: string) {
+  if (modelId.startsWith('bfl/')) {
+    return InlineBlackForestLabsLight;
+  }
+
+  return null;
 }
 
 function InsightCard({
@@ -538,44 +536,6 @@ function storageHealthBarClass(score: number) {
   }
 
   return 'bg-rose-300';
-}
-
-function ProviderMixCard({
-  providers,
-}: {
-  providers: UsageMetrics['providerMix'];
-}) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
-      <div className="flex items-center gap-2.5">
-        <MetricIcon tone="neutral">
-          <Cpu className="size-4" aria-hidden="true" />
-        </MetricIcon>
-        <p className="text-sm font-medium text-slate-200">Provider mix</p>
-      </div>
-
-      <div className="mt-4 space-y-3">
-        {providers.map((provider) => (
-          <div key={provider.label}>
-            <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="min-w-0 truncate text-slate-300">
-                {provider.label}
-              </span>
-              <span className="shrink-0 font-semibold text-white">
-                {formatNumber(provider.value)} · {formatPercent(provider.share)}
-              </span>
-            </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-950/70">
-              <div
-                className="h-full rounded-full bg-fuchsia-200"
-                style={{ width: `${Math.max(provider.share, 4)}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 function MetricIcon({
